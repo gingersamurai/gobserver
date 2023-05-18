@@ -1,0 +1,20 @@
+- path: ./test/test1
+  include_regexp:
+    - .*.go$
+    - .*.env$
+  exclude_regexp:
+    - .*bibaboba.*
+  commands:
+    - pwd
+    - sleep 5
+  log_file: biba.log
+
+- path: /home/gingersamurai/coding/projects/gobserver/test/test2
+  include_regexp:
+    - .*.py$
+    - .*GOODBIBA.*
+  exclude_regexp:
+    - .*BADBIBA.*
+  commands:
+    - echo "message to stderr" 1&>2
+    - echo "yet another stderr msg" 1&>2
