@@ -4,13 +4,14 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"gobserver/internal/entity"
+	"os"
 	"testing"
 	"time"
 )
 
 func TestPostgresStorage(t *testing.T) {
 	t.Run("simple", func(t *testing.T) {
-		connStr := "host=localhost user=postgres password=12345678 dbname=postgres"
+		connStr := os.Getenv("GOOSE_DBSTRING")
 		ps, err := NewPostgresStorage(connStr)
 		assert.NoError(t, err)
 
