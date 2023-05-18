@@ -118,3 +118,7 @@ func (w *Watcher) validateEvents(events <-chan Event) <-chan Event {
 
 	return out
 }
+
+func (w *Watcher) Shutdown() error {
+	return w.fsWatcher.Close()
+}
