@@ -19,29 +19,13 @@ type Watcher struct {
 	ExcludeRegex []string
 }
 
-func NewWatcher(path string, includeRegex, excludeRegex []string) (*Watcher, error) {
+func NewWatcher() (*Watcher, error) {
 	fsWatcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, err
 	}
-	dirs, err := FilePathWalkDir(path)
-	if err != nil {
-		return nil, err
-	}
 
-	for _, dir := range dirs {
-		err = fsWatcher.Add(dir)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return &Watcher{
-		fsWatcher:    fsWatcher,
-		Path:         path,
-		IncludeRegex: includeRegex,
-		ExcludeRegex: excludeRegex,
-	}, nil
+	return &Watcher{fsWatcher: fsWatcher}, nil
 }
 
 func FilePathWalkDir(root string) ([]string, error) {
@@ -55,7 +39,20 @@ func FilePathWalkDir(root string) ([]string, error) {
 	return files, err
 }
 
-func (w *Watcher) Listen() (<-chan Event, error) {
+func (w *Watcher) Listen(path string, includeRegex, excludeRegex []string) (<-chan Event, error) {
+	dirs, err := FilePathWalkDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, dir := range dirs {
+		err = w.fsWatcher.Add(dir)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	w.IncludeRegex, w.ExcludeRegex = includeRegex, excludeRegex
 
 	fsEvents := w.fsWatcher.Events
 	return w.validateEvents(w.castEvents(fsEvents)), nil
