@@ -2,15 +2,11 @@ package watcher
 
 import (
 	"github.com/fsnotify/fsnotify"
+	"gobserver/internal/entity"
 	"os"
 	"path/filepath"
 	"regexp"
 )
-
-type Event struct {
-	Path      string
-	Operation string
-}
 
 type Watcher struct {
 	fsWatcher    *fsnotify.Watcher
@@ -39,7 +35,7 @@ func FilePathWalkDir(root string) ([]string, error) {
 	return files, err
 }
 
-func (w *Watcher) Listen(path string, includeRegex, excludeRegex []string) (<-chan Event, error) {
+func (w *Watcher) Listen(path string, includeRegex, excludeRegex []string) (<-chan entity.Event, error) {
 	dirs, err := FilePathWalkDir(path)
 	if err != nil {
 		return nil, err
@@ -58,8 +54,8 @@ func (w *Watcher) Listen(path string, includeRegex, excludeRegex []string) (<-ch
 	return w.validateEvents(w.castEvents(fsEvents)), nil
 }
 
-func (w *Watcher) castEvents(fsEvents <-chan fsnotify.Event) <-chan Event {
-	out := make(chan Event)
+func (w *Watcher) castEvents(fsEvents <-chan fsnotify.Event) <-chan entity.Event {
+	out := make(chan entity.Event)
 	go func() {
 		for event := range fsEvents {
 			out <- w.castEvent(event)
@@ -70,21 +66,21 @@ func (w *Watcher) castEvents(fsEvents <-chan fsnotify.Event) <-chan Event {
 	return out
 }
 
-func (w *Watcher) castEvent(event fsnotify.Event) Event {
+func (w *Watcher) castEvent(event fsnotify.Event) entity.Event {
 	if event.Has(fsnotify.Create) {
 		stat, _ := os.Stat(event.Name)
 		if stat.IsDir() {
 			_ = w.fsWatcher.Add(event.Name)
 		}
 	}
-	return Event{
+	return entity.Event{
 		Path:      event.Name,
 		Operation: event.Op.String(),
 	}
 }
 
-func (w *Watcher) validateEvents(events <-chan Event) <-chan Event {
-	out := make(chan Event)
+func (w *Watcher) validateEvents(events <-chan entity.Event) <-chan entity.Event {
+	out := make(chan entity.Event)
 	go func() {
 		for event := range events {
 			flag := false
