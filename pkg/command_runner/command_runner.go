@@ -21,9 +21,11 @@ func (cr CommandRunner) RunCommand(command, dir string) (string, string, int, er
 	if err != nil {
 		return "", "", 0, err
 	}
-	err = cmd.Wait()
-	if err != nil {
-		return "", "", 0, err
+
+	if err = cmd.Wait(); err != nil {
+		if _, ok := err.(*exec.ExitError); !ok {
+			return "", "", 0, err
+		}
 	}
 	return stdout.String(), stderr.String(), cmd.ProcessState.ExitCode(), nil // вернуть код выхода
 }

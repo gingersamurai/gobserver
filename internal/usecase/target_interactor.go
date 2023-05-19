@@ -81,18 +81,39 @@ func (ti *TargetInteractor) Run(wg *sync.WaitGroup) {
 				})
 			if err != nil {
 				log.Println(err)
-				return
+				break
 			}
 
-			err = os.WriteFile(ti.target.LogFile, []byte(stderr), 0666)
+			err = AppendToFile(ti.target.LogFile, stderr)
 			if err != nil {
 				log.Println(err)
 				return
 			}
+
 			if exitCode != 0 {
 				break
 			}
-
 		}
 	}
+}
+
+func AppendToFile(path string, text string) error {
+	if path == "" {
+		return nil
+	}
+
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	_, err = file.WriteString(text)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

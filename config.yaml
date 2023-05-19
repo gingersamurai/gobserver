@@ -1,5 +1,7 @@
+# таймаут для завершения работы
 shutdown_timeout: 5s
 
+# конфигурация целей для отслеживания
 targets:
 
 - path: ./test/test1
@@ -7,17 +9,17 @@ targets:
     - .*.go$
     - .*.env$
   exclude_regexp:
-    - .*bibaboba.*
+    - .*bad.*
   commands:
     - pwd
     - python3 ../err_writer.py
-  log_file: biba.log
+    - ls
+  log_file: log1.txt
 
 - path: /home/gingersamurai/coding/projects/gobserver/test/test2
   include_regexp:
     - .*.py$
-    - .*GOODBIBA.*
   exclude_regexp:
-    - .*BADBIBA.*
+    - .*\.txt$
   commands:
     - sleep 3

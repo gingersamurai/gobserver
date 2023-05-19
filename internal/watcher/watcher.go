@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/fsnotify/fsnotify"
 	"gobserver/internal/entity"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -70,7 +71,10 @@ func (w *Watcher) castEvents(fsEvents <-chan fsnotify.Event) <-chan entity.Event
 func (w *Watcher) castEvent(event fsnotify.Event) entity.Event {
 
 	if event.Has(fsnotify.Create) {
-		stat, _ := os.Stat(event.Name)
+		stat, err := os.Stat(event.Name)
+		if err != nil {
+			log.Fatal(err)
+		}
 		if stat.IsDir() {
 			_ = w.fsWatcher.Add(event.Name)
 		}

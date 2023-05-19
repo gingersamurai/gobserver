@@ -11,3 +11,7 @@ migrate:
 
 local_postgres_init:
 	docker run --rm --name local-postgres -p 5432:5432 -e POSTGRES_PASSWORD=12345678 -d postgres
+
+clean:
+	goose  -dir ./migrations down
+	docker stop local-postgres
