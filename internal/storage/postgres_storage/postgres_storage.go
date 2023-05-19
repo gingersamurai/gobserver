@@ -4,14 +4,15 @@ import (
 	"context"
 	"github.com/jackc/pgx/v5"
 	"gobserver/internal/entity"
+	"os"
 )
 
 type PostgresStorage struct {
 	conn *pgx.Conn
 }
 
-func NewPostgresStorage(connStr string) (*PostgresStorage, error) {
-	conn, err := pgx.Connect(context.Background(), connStr)
+func NewPostgresStorage() (*PostgresStorage, error) {
+	conn, err := pgx.Connect(context.Background(), os.Getenv("GOOSE_DBSTRING"))
 	if err != nil {
 		return nil, err
 	}

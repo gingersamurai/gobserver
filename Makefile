@@ -1,5 +1,11 @@
 .PHONY: test migrate local_postgres_init
 
+run:
+	go run gobserver/cmd/cli_app
+
+build:
+	go build -o ./build/gobserver gobserver
+
 test:
 	go test gobserver/...
 

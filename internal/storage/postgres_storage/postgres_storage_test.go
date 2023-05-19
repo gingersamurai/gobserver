@@ -4,15 +4,13 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"gobserver/internal/entity"
-	"os"
 	"testing"
 	"time"
 )
 
 func TestPostgresStorage(t *testing.T) {
 	t.Run("simple", func(t *testing.T) {
-		connStr := os.Getenv("GOOSE_DBSTRING")
-		ps, err := NewPostgresStorage(connStr)
+		ps, err := NewPostgresStorage()
 		assert.NoError(t, err)
 
 		_, err = ps.AddFileChange(context.Background(), entity.FileChange{

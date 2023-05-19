@@ -1,4 +1,4 @@
-package watcher
+package watcher_wrap
 
 import (
 	"github.com/fsnotify/fsnotify"

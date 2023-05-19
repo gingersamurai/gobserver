@@ -6,13 +6,13 @@ import (
 )
 
 type Config struct {
-	targets []TargetConfig
+	Targets []TargetConfig `mapstructure:"targets" validate:"required"`
 }
 
 type TargetConfig struct {
 	Path          string   `mapstructure:"path" validate:"required"`
-	IncludeRegexp string   `mapstructure:"include_regexp"`
-	ExcludeRegexp string   `mapstructure:"exclude_regexp"`
+	IncludeRegexp []string `mapstructure:"include_regexp"`
+	ExcludeRegexp []string `mapstructure:"exclude_regexp"`
 	Commands      []string `mapstructure:"commands"`
 	LogFile       string   `mapstructure:"log_file" validate:"filepath"`
 }
