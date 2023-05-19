@@ -1,6 +1,7 @@
 shutdown_timeout: 5s
 
 targets:
+
 - path: ./test/test1
   include_regexp:
     - .*.go$
@@ -9,7 +10,7 @@ targets:
     - .*bibaboba.*
   commands:
     - pwd
-    - sleep 5
+    - python3 ../err_writer.py
   log_file: biba.log
 
 - path: /home/gingersamurai/coding/projects/gobserver/test/test2
@@ -19,5 +20,4 @@ targets:
   exclude_regexp:
     - .*BADBIBA.*
   commands:
-    - echo "message to stderr" 1&>2
-    - echo "yet another stderr msg" 1&>2
+    - sleep 3

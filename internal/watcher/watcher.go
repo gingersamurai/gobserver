@@ -1,6 +1,7 @@
-package watcher_wrap
+package watcher
 
 import (
+	"context"
 	"github.com/fsnotify/fsnotify"
 	"gobserver/internal/entity"
 	"os"
@@ -67,16 +68,19 @@ func (w *Watcher) castEvents(fsEvents <-chan fsnotify.Event) <-chan entity.Event
 }
 
 func (w *Watcher) castEvent(event fsnotify.Event) entity.Event {
+
 	if event.Has(fsnotify.Create) {
 		stat, _ := os.Stat(event.Name)
 		if stat.IsDir() {
 			_ = w.fsWatcher.Add(event.Name)
 		}
 	}
-	return entity.Event{
+	result := entity.Event{
 		Path:      event.Name,
 		Operation: event.Op.String(),
 	}
+
+	return result
 }
 
 func (w *Watcher) validateEvents(events <-chan entity.Event) <-chan entity.Event {
@@ -100,10 +104,10 @@ func (w *Watcher) validateEvents(events <-chan entity.Event) <-chan entity.Event
 					flag = false
 				}
 			}
-
 			if flag {
 				out <- event
 			}
+
 		}
 
 		close(out)
@@ -112,6 +116,6 @@ func (w *Watcher) validateEvents(events <-chan entity.Event) <-chan entity.Event
 	return out
 }
 
-func (w *Watcher) Shutdown() error {
+func (w *Watcher) Shutdown(context.Context) error {
 	return w.fsWatcher.Close()
 }

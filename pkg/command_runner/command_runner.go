@@ -2,7 +2,6 @@ package command_runner
 
 import (
 	"bytes"
-	"fmt"
 	"os/exec"
 )
 
@@ -26,6 +25,5 @@ func (cr CommandRunner) RunCommand(command, dir string) (string, string, int, er
 	if err != nil {
 		return "", "", 0, err
 	}
-	fmt.Println(cmd.Process.Pid)
 	return stdout.String(), stderr.String(), cmd.ProcessState.ExitCode(), nil // вернуть код выхода
 }

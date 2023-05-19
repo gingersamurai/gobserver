@@ -3,7 +3,9 @@ package usecase
 import (
 	"context"
 	"gobserver/internal/entity"
+	"log"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -37,13 +39,19 @@ func NewTargetInteractor(target Target, storage Storage,
 	}
 }
 
-func (ti *TargetInteractor) Run() {
-	changesCh, err := ti.watcher.Listen(ti.target.Path, ti.target.ExcludeRegex, ti.target.ExcludeRegex)
+func (ti *TargetInteractor) Run(wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	changesCh, err := ti.watcher.Listen(ti.target.Path,
+		ti.target.IncludeRegexp,
+		ti.target.ExcludeRegexp)
 	if err != nil {
+		log.Println(err)
 		return
 	}
 
 	for change := range changesCh {
+
 		_, err := ti.storage.AddFileChange(context.Background(),
 			entity.FileChange{
 				ProjectPath: ti.target.Path,
@@ -52,14 +60,18 @@ func (ti *TargetInteractor) Run() {
 				Timestamp:   time.Now(),
 			})
 		if err != nil {
+			log.Println(err)
 			return
 		}
+
 		for _, command := range ti.target.Commands {
 
 			_, stderr, exitCode, err := ti.commandRunner.RunCommand(command, ti.target.Path)
 			if err != nil {
-				break
+				log.Println(err)
+				return
 			}
+
 			_, err = ti.storage.AddCommandExecution(context.Background(),
 				entity.CommandExecution{
 					ProjectPath: ti.target.Path,
@@ -68,15 +80,19 @@ func (ti *TargetInteractor) Run() {
 					Timestamp:   time.Now(),
 				})
 			if err != nil {
-				break
+				log.Println(err)
+				return
 			}
+
 			err = os.WriteFile(ti.target.LogFile, []byte(stderr), 0666)
 			if err != nil {
-				break
+				log.Println(err)
+				return
 			}
 			if exitCode != 0 {
 				break
 			}
+
 		}
 	}
 }

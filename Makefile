@@ -1,13 +1,10 @@
-.PHONY: test migrate local_postgres_init
+.PHONY: run build test migrate local_postgres_init
 
 run:
 	go run gobserver/cmd/cli_app
 
 build:
-	go build -o ./build/gobserver gobserver
-
-test:
-	go test gobserver/...
+	go build -o ./build/gobserver-cli gobserver/cmd/cli_app
 
 migrate:
 	goose -dir ./migrations up
