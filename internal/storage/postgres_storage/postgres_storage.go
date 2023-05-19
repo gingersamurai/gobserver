@@ -51,3 +51,7 @@ func (ps *PostgresStorage) AddFileChange(ctx context.Context, fileChange entity.
 	}
 	return id, nil
 }
+
+func (ps *PostgresStorage) Shutdown(ctx context.Context) error {
+	return ps.conn.Close(ctx)
+}

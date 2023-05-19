@@ -5,9 +5,9 @@ import (
 	"gobserver/internal/storage/postgres_storage"
 	"gobserver/internal/usecase"
 	"gobserver/internal/watcher_wrap"
+	"gobserver/pkg/closer"
 	"gobserver/pkg/command_runner"
 	"log"
-	"time"
 )
 
 const (
@@ -16,15 +16,18 @@ const (
 )
 
 func main() {
-
 	appConfig, err := config.NewConfig(configFilePath, configFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	appCloser := closer.NewCloser(appConfig.ShutdownTimeout)
+
 	appStorage, err := postgres_storage.NewPostgresStorage()
 	if err != nil {
 		log.Fatal(err)
 	}
+	appCloser.Add(appStorage.Shutdown)
 	commandRunner := command_runner.NewCommandRunner()
 	for _, target := range appConfig.Targets {
 		watcher, err := watcher_wrap.NewWatcher()
@@ -40,5 +43,5 @@ func main() {
 		}, appStorage, watcher, commandRunner)
 		go appTargetInteractor.Run()
 	}
-	time.Sleep(10 * time.Hour)
+	appCloser.Run()
 }

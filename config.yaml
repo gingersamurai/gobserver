@@ -1,3 +1,5 @@
+shutdown_timeout: 5s
+
 targets:
 - path: ./test/test1
   include_regexp:

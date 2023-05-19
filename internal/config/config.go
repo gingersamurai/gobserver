@@ -3,10 +3,12 @@ package config
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
+	"time"
 )
 
 type Config struct {
-	Targets []TargetConfig `mapstructure:"targets" validate:"required"`
+	ShutdownTimeout time.Duration  `mapstructure:"shutdown_timeout"`
+	Targets         []TargetConfig `mapstructure:"targets" validate:"required"`
 }
 
 type TargetConfig struct {
